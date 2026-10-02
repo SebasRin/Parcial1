@@ -1,5 +1,6 @@
 Code.require_file("datos.exs")
 Code.require_file("validacion.exs")
+Code.require_file("liquidacion.exs")
 
 defmodule Programa do
 
@@ -12,8 +13,13 @@ defmodule Programa do
   def main do
     confeccionistas = Datos.confeccionistas()
     lineas = Datos.lineas()
-    Validacion.validacion_lote(confeccionistas, lineas, %{confeccionista: "C01", linea: "L1", dia: 7, prendas: 70, defectos: "5"})
+    Validacion.validacion_lote(confeccionistas, lineas, %{confeccionista: "C01", linea: "L1", dia: 2, prendas: 70, defectos: 5})
     |> IO.inspect()
+
+    Liquidacion.valor_lote(%{confeccionista: "C01", linea: "L1", dia: 2, prendas: 70, defectos: 10})
+    |> IO.puts()
+
+
   end
 
 end

@@ -5,8 +5,8 @@ defmodule Validacion do
 
   def validacion_lote(confeccionistas, lineas, lote) do
 
-    with %{} <- Map.get(confeccionistas, lote.confeccionista, :confeccionista_no_existe),
-        %{} <- Map.get(lineas, lote.linea, :linea_no_existe),
+    with %{} <- Enum.find(confeccionistas, :confeccionista_no_existe, &(&1.codigo == lote.confeccionista)),
+        %{} <- Enum.find(lineas,:linea_no_existe , &(&1.id == lote.linea)),
         :ok <- validar_dia(lote.dia),
         :ok <- validar_prenda(lote.prendas),
         :ok <- validar_defectos(lote.defectos) do
@@ -22,8 +22,10 @@ defmodule Validacion do
     end
   end
 
+
   defp validar_dia(dia) when is_integer(dia) and dia >= 1 and dia <= 6 do
     :ok
+
   end
   defp validar_dia(_) do
     :error_dia
