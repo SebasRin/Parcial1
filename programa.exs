@@ -24,10 +24,8 @@ defmodule Programa do
         prendas: 70, defectos: 1.5},
       %{confeccionista: "C01", linea: "L2", dia: 1,
         prendas: 55, defectos: 7},
-      %{confeccionista: "C01", linea: "L2", dia: 1,
-        prendas: 55, defectos: 7},
-      %{confeccionista: "C02", linea: "L2", dia: 1,
-        prendas: 55, defectos: 7}
+      %{confeccionista: "C01", linea: "L2", dia: 2,
+        prendas: 90, defectos: 12}
       # ...
     ])
 
@@ -38,7 +36,7 @@ defmodule Programa do
     ], [
       %{confeccionista: "C01", linea: "L1", dia: 1,
         prendas: 70, defectos: 1.5},
-      %{confeccionista: "C01", linea: "L2", dia: 1,
+      %{confeccionista: "C01", linea: "L2", dia: 2,
         prendas: 55, defectos: 7},
       %{confeccionista: "C01", linea: "L2", dia: 1,
         prendas: 55, defectos: 7},
@@ -48,6 +46,16 @@ defmodule Programa do
     ])
   end
 
+    Liquidacion.liquidacion([%{codigo: "C01", nombre: "María Elena Ríos", alquiler: true}],
+      [],[
+      %{confeccionista: "C01", linea: "L1", dia: 1,
+        prendas: 70, defectos: 1.5},
+      %{confeccionista: "C01", linea: "L2", dia: 1,
+        prendas: 55, defectos: 7},
+      %{confeccionista: "C01", linea: "L2", dia: 2,
+        prendas: 90, defectos: 12}
 
+      # ...
+    ])
 end
 Programa.main()
