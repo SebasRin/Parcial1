@@ -7,16 +7,17 @@ defmodule Programa do
   @moduledoc """
 
   """
-
-
-
-  def main do
+    def main do
     confeccionistas = Datos.confeccionistas()
     lineas = Datos.lineas()
+    lotes = Datos.lotes()
+
+    lotes_ok(confeccionistas, lineas, lotes)
+
     Validacion.validacion_lote(confeccionistas, lineas, %{confeccionista: "C01", linea: "L1", dia: 2, prendas: 70, defectos: 5})
     |> IO.inspect()
 
-    Liquidacion.valor_lote(%{confeccionista: "C01", linea: "L1", dia: 2, prendas: 70, defectos: 10})
+    Liquidacion.valor_lote(%{confeccionista: "C01", linea: "L1", dia: 2, prendas: 70, defectos: -1})
     |> IO.puts()
 
     Liquidacion.bonificacion_por_productividad([
@@ -44,7 +45,6 @@ defmodule Programa do
         prendas: 55, defectos: 7}
       # ...
     ])
-  end
 
     Liquidacion.liquidacion([%{codigo: "C01", nombre: "María Elena Ríos", alquiler: true}],
       [],[
@@ -57,5 +57,21 @@ defmodule Programa do
 
       # ...
     ])
+    end
+
+
+    defp lotes_ok(confeccionistas, lineas, lotes) do
+      Enum.filter(lotes, fn lote ->
+        match?({:ok, _},Validacion.validacion_lote(confeccionistas, lineas, lote))
+      end)
+      |> IO.inspect(label: "Listas ok")
+    end
+
+    def lotes_error(confeccionistas, lineas, lotes)do
+      Enum.filter(lotes, fn lote ->
+        match?({:error, _},Validacion.validacion_lote(confeccionistas, lineas, lote))
+      end)
+    end
+
 end
 Programa.main()

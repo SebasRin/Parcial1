@@ -1,10 +1,12 @@
+
+
 defmodule Liquidacion do
   @moduledoc """
 
   """
 
-  def valor_lote(lote) do
 
+  def valor_lote(lote) do
     valor_base = lote.prendas * 3200
     cond do
       lote.defectos <= 2 -> valor_base + (valor_base * 0.07)
@@ -14,6 +16,7 @@ defmodule Liquidacion do
 
     end
   end
+
 
   def bonificacion_por_productividad(lotes) do
       mapa =
