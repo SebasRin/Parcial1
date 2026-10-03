@@ -58,7 +58,7 @@ defmodule Liquidacion do
     |> length()
   end
 
-  def liquidacion(confeccionistas,_lineas, lotes) do
+  def liquidacion(confeccionistas, lotes) do
 
     bonificacion = bonificacion_por_productividad(lotes)
     alquiler = alquiler_maquinas(confeccionistas, lotes)
@@ -67,7 +67,8 @@ defmodule Liquidacion do
         Map.update(acc, {lote.confeccionista}, valor_lote(lote), &(&1 + valor_lote(lote)))
     end)
     |> Enum.map(fn {{codigo}, subtotal} ->
-        subtotal + Map.get(bonificacion, codigo) - Map.get(alquiler, codigo)
+        resultado = subtotal + Map.get(bonificacion, codigo) - Map.get(alquiler, codigo)
+        {codigo, resultado}
     end)
     |> IO.inspect(label: "Liquidacion")
 

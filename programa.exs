@@ -12,51 +12,21 @@ defmodule Programa do
     lineas = Datos.lineas()
     lotes = Datos.lotes()
 
-    lotes_ok(confeccionistas, lineas, lotes)
+    lotes_ok = lotes_ok(confeccionistas, lineas, lotes)
+    #lotes_error = lotes_error(confeccionistas, lineas, lotes)
 
-    Validacion.validacion_lote(confeccionistas, lineas, %{confeccionista: "C01", linea: "L1", dia: 2, prendas: 70, defectos: 5})
+    Validacion.validacion_lote(confeccionistas, lineas,%{confeccionista: "C01", linea: "L77", dia: 1, prendas: 500, defectos: "abc"})
     |> IO.inspect()
 
-    Liquidacion.valor_lote(%{confeccionista: "C01", linea: "L1", dia: 2, prendas: 70, defectos: -1})
+    Liquidacion.valor_lote(%{confeccionista: "C01", linea: "L77", dia: 1, prendas: 500, defectos: "abc"})
+    |> Util.formatter()
     |> IO.puts()
 
-    Liquidacion.bonificacion_por_productividad([
-      %{confeccionista: "C01", linea: "L1", dia: 1,
-        prendas: 70, defectos: 1.5},
-      %{confeccionista: "C01", linea: "L2", dia: 1,
-        prendas: 55, defectos: 7},
-      %{confeccionista: "C01", linea: "L2", dia: 2,
-        prendas: 90, defectos: 12}
-      # ...
-    ])
+    Liquidacion.bonificacion_por_productividad(lotes_ok)
 
-    Liquidacion.alquiler_maquinas([
-      %{codigo: "C01", nombre: "María Elena Ríos", alquiler: true},
-      %{codigo: "C02", nombre: "Andrés Salazar", alquiler: false}
-      # ...
-    ], [
-      %{confeccionista: "C01", linea: "L1", dia: 1,
-        prendas: 70, defectos: 1.5},
-      %{confeccionista: "C01", linea: "L2", dia: 2,
-        prendas: 55, defectos: 7},
-      %{confeccionista: "C01", linea: "L2", dia: 1,
-        prendas: 55, defectos: 7},
-      %{confeccionista: "C02", linea: "L2", dia: 1,
-        prendas: 55, defectos: 7}
-      # ...
-    ])
+    Liquidacion.alquiler_maquinas(confeccionistas,lotes_ok)
 
-    Liquidacion.liquidacion([%{codigo: "C01", nombre: "María Elena Ríos", alquiler: true}],
-      [],[
-      %{confeccionista: "C01", linea: "L1", dia: 1,
-        prendas: 70, defectos: 1.5},
-      %{confeccionista: "C01", linea: "L2", dia: 1,
-        prendas: 55, defectos: 7},
-      %{confeccionista: "C01", linea: "L2", dia: 2,
-        prendas: 90, defectos: 12}
-
-      # ...
-    ])
+    Liquidacion.liquidacion(confeccionistas,lotes_ok)
     end
 
 
@@ -64,14 +34,14 @@ defmodule Programa do
       Enum.filter(lotes, fn lote ->
         match?({:ok, _},Validacion.validacion_lote(confeccionistas, lineas, lote))
       end)
-      |> IO.inspect(label: "Listas ok")
+
     end
 
-    def lotes_error(confeccionistas, lineas, lotes)do
-      Enum.filter(lotes, fn lote ->
-        match?({:error, _},Validacion.validacion_lote(confeccionistas, lineas, lote))
-      end)
-    end
+    #defp lotes_error(confeccionistas, lineas, lotes)do
+    #  Enum.filter(lotes, fn lote ->
+    #    match?({:error, _},Validacion.validacion_lote(confeccionistas, lineas, lote))
+    #  end)
+    #end
 
 end
 Programa.main()

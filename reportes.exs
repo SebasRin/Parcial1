@@ -34,6 +34,8 @@ defmodule Reportes do
 
   end
 
-  def reporte_r2()
+  def reporte_r2() do
+    
+  end
 
 end
