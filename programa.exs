@@ -1,6 +1,7 @@
 Code.require_file("datos.exs")
 Code.require_file("validacion.exs")
 Code.require_file("liquidacion.exs")
+Code.require_file("reportes.exs")
 
 defmodule Programa do
 
@@ -13,7 +14,10 @@ defmodule Programa do
     lotes = Datos.lotes()
 
     lotes_ok = lotes_ok(confeccionistas, lineas, lotes)
-    #lotes_error = lotes_error(confeccionistas, lineas, lotes)
+    lotes_error = lotes_error(confeccionistas, lineas, lotes)
+
+    Reportes.reporte_r1(confeccionistas, lineas, lotes_error)
+
 
     Validacion.validacion_lote(confeccionistas, lineas,%{confeccionista: "C01", linea: "L77", dia: 1, prendas: 500, defectos: "abc"})
     |> IO.inspect()
@@ -37,11 +41,11 @@ defmodule Programa do
 
     end
 
-    #defp lotes_error(confeccionistas, lineas, lotes)do
-    #  Enum.filter(lotes, fn lote ->
-    #    match?({:error, _},Validacion.validacion_lote(confeccionistas, lineas, lote))
-    #  end)
-    #end
+    defp lotes_error(confeccionistas, lineas, lotes)do
+      Enum.filter(lotes, fn lote ->
+        match?({:error, _},Validacion.validacion_lote(confeccionistas, lineas, lote))
+      end)
+    end
 
 end
 Programa.main()

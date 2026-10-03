@@ -7,16 +7,22 @@ defmodule Reportes do
 
   def reporte_r1(confeccionistas, lineas, lotes_err) do
 
+    rechazados =
+      Enum.map(lotes_err, fn lote ->
+        {:error, motivo} = Validacion.validacion_lote(confeccionistas, lineas, lote)
+        {lote, motivo}
+      end)
 
-    Enum.each(lotes_err, fn lote ->
-      result = Validacion.validacion_lote(confeccionistas, lineas, lote)
-      motivo = elem(result, 1)
-
-      IO.puts("#{lote}, Motivo: #{motivo}")
+    IO.puts("==================================================================")
+    IO.puts("Reporte 1")
+    Enum.each(rechazados, fn {lote, motivo} ->
+      IO.puts("#{inspect(lote)}, Motivo: #{motivo}")
     end)
 
+
+
     conteo =
-    Enum.reduce(lotes_err, %{
+    Enum.reduce(rechazados, %{
       confeccionista_desconocido: 0,
       linea_desconocida: 0,
       dia_invalido: 0,
@@ -32,10 +38,10 @@ defmodule Reportes do
     IO.puts("prendas_fuera_de_rango: #{conteo.prendas_fuera_de_rango}")
     IO.puts("porcentaje_invalido: #{conteo.porcentaje_invalido}")
 
+    IO.puts("=============================================================================")
+
   end
 
-  def reporte_r2() do
-    
-  end
+
 
 end
