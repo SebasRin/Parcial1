@@ -13,8 +13,28 @@ defmodule Liquidacion do
       true -> valor_base - (valor_base * 0.25)
 
     end
+  end
+
+  def bonificacion_por_productividad(lotes) do
+      mapa =
+      Enum.reduce(lotes, %{}, fn lote, acc ->
+        Map.update(acc, {lote.confeccionista, lote.dia}, lote.prendas, &(&1 + lote.prendas))
+      end)
+
+      Map.new(mapa, fn {{confeccionista, dia}, total} ->
+        {{confeccionista, dia}, %{total_prendas: total, bonificacion: total >= 120}}
+
+      end)
+      |> IO.inspect(label: "Confeccionistas que se le aplica la bonificaion")
+  end
 
 
+  def alquiler_maquinas(confeccionistas, lotes)do
+    Map.new(confeccionistas, fn confe ->
+      valor = confe.alquiler == true and Enum.any?(lotes, fn lote -> lote.confeccionista == confe.codigo end)
+      {confe.codigo, valor}
+    end)
+    |> IO.inspect(label: "Alquiler maquinas")
   end
 
 end
