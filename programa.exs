@@ -18,6 +18,7 @@ defmodule Programa do
 
     Reportes.reporte_r1(confeccionistas, lineas, lotes_error)
     Reportes.reporte_r2(lineas, lotes_ok)
+    Reportes.reporte_r3(lotes_ok)
 
 
     Validacion.validacion_lote(confeccionistas, lineas,%{confeccionista: "C01", linea: "L77", dia: 1, prendas: 500, defectos: "abc"})

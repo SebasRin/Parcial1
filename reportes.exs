@@ -41,6 +41,8 @@ defmodule Reportes do
   end
 
   def reporte_r2(lineas, lotes) do
+    IO.puts("=======================================================")
+    IO.puts("Reporte 2")
     prendas_totales=
     Enum.reduce(lotes,%{}, fn lote, acc ->
         Map.update(acc, lote.linea, lote.prendas, &(&1 + lote.prendas))
@@ -53,8 +55,42 @@ defmodule Reportes do
     end)
     |> Enum.sort_by(&(&1.productividad), :desc)
     |> IO.inspect()
+
+    
+
   end
 
+  def reporte_r3(lotes) do
+    IO.puts("=======================================================")
+    IO.puts("Reporte 3")
+    rango_dias = 1..6
+
+    suma_prendas =
+    Enum.reduce(lotes, %{}, fn lote, acc ->
+      Map.update(acc, lote.dia, lote.prendas, &(&1 + lote.prendas))
+    end)
+
+    mapa =
+    Enum.map(rango_dias, fn dia ->
+      prendas = Map.get(suma_prendas, dia, 0)
+      %{dia: dia, prendas: prendas, alcanzo_meta: prendas >= 600}
+    end)
+
+    Enum.each(mapa, fn dias ->
+      IO.inspect(dias)
+    end)
+
+    todo_dias = Enum.all?(mapa, fn meta -> meta.alcanzo_meta end )
+    algun_dia = Enum.any?(mapa, fn meta -> meta.alcanzo_meta end)
+    IO.puts("Meta diaria: #{todo_dias}")
+    IO.puts("Al menos un dia: #{algun_dia}")
+
+    IO.puts("=======================================================")
 
 
+  end
+
+  def reporte_r4() do
+
+  end
 end
