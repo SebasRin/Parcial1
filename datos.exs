@@ -15,7 +15,8 @@ defmodule Datos do
     [
       %{id: "L1", nombre: "Línea Norte", puestos: 6},
       %{id: "L2", nombre: "Línea Central", puestos: 4},
-      %{id: "L3", nombre: "Línea Sur", puestos: 5}
+      %{id: "L3", nombre: "Línea Sur", puestos: 5},
+      %{id: "L4", nombre: "Linea Este", puestos: 2}
     ]
   end
   def lotes do

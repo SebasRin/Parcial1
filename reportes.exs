@@ -19,8 +19,6 @@ defmodule Reportes do
       IO.puts("#{inspect(lote)}, Motivo: #{motivo}")
     end)
 
-
-
     conteo =
     Enum.reduce(rechazados, %{
       confeccionista_desconocido: 0,
@@ -40,6 +38,21 @@ defmodule Reportes do
 
     IO.puts("=============================================================================")
 
+  end
+
+  def reporte_r2(lineas, lotes) do
+    prendas_totales=
+    Enum.reduce(lotes,%{}, fn lote, acc ->
+        Map.update(acc, lote.linea, lote.prendas, &(&1 + lote.prendas))
+    end)
+    Enum.map(lineas, fn linea ->
+      prendas = Map.get(prendas_totales, linea.id, 0)
+      productividad = prendas / linea.puestos
+
+      %{id: linea.id, prendas: prendas, productividad: productividad}
+    end)
+    |> Enum.sort_by(&(&1.productividad), :desc)
+    |> IO.inspect()
   end
 
 
