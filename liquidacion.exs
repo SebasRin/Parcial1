@@ -6,8 +6,13 @@ defmodule Liquidacion do
   """
 
 
+  @tarifa_base_prenda 3200
+  @prendas_diarias_bonificacion 120
+  @bonificacion_diaria 18000
+  @alquiler_maquina 15000
+
   def valor_lote(lote) do
-    valor_base = lote.prendas * 3200
+    valor_base = lote.prendas * @tarifa_base_prenda
     cond do
       lote.defectos <= 2 -> valor_base + (valor_base * 0.07)
       lote.defectos > 2 and lote.defectos <= 5 -> valor_base
@@ -26,8 +31,8 @@ defmodule Liquidacion do
 
       Enum.reduce(mapa, %{}, fn {{codigo, _dia}, total}, acc ->
         bonificacion =
-        if total >= 120 do
-            18000
+        if total >= @prendas_diarias_bonificacion do
+            @bonificacion_diaria
         else
           0
         end
@@ -40,7 +45,7 @@ defmodule Liquidacion do
   def alquiler_maquinas(confeccionistas, lotes)do
     Map.new(confeccionistas, fn confe ->
       if confe.alquiler == true and Enum.any?(lotes, fn lote -> lote.confeccionista == confe.codigo end) do
-        {confe.codigo, 15000 * contar_dias(confe.codigo, lotes)}
+        {confe.codigo, @alquiler_maquina * contar_dias(confe.codigo, lotes)}
       else
         {confe.codigo, 0}
       end

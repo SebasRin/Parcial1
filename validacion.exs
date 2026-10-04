@@ -3,6 +3,9 @@ defmodule Validacion do
 
   """
 
+  @dias_produccion 6
+  @maximo_prendas_lote 180
+
   def validacion_lote(confeccionistas, lineas, lote) do
 
     with %{} <- Enum.find(confeccionistas, :confeccionista_no_existe, &(&1.codigo == lote.confeccionista)),
@@ -23,7 +26,7 @@ defmodule Validacion do
   end
 
 
-  defp validar_dia(dia) when is_integer(dia) and dia >= 1 and dia <= 6 do
+  defp validar_dia(dia) when is_integer(dia) and dia >= 1 and dia <= @dias_produccion do
     :ok
 
   end
@@ -31,7 +34,7 @@ defmodule Validacion do
     :error_dia
   end
 
-  defp validar_prenda(prenda) when is_integer(prenda) and prenda >= 1 and prenda <= 180 do
+  defp validar_prenda(prenda) when is_integer(prenda) and prenda >= 1 and prenda <= @maximo_prendas_lote do
     :ok
   end
   defp validar_prenda(_) do

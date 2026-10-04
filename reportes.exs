@@ -3,7 +3,8 @@ defmodule Reportes do
 
   """
 
-
+  @meta_diaria_taller 600
+  @dias_produccion 6
 
   def reporte_r1(confeccionistas, lineas, lotes_err) do
 
@@ -63,7 +64,7 @@ defmodule Reportes do
   def reporte_r3(lotes) do
     IO.puts("=======================================================")
     IO.puts("Reporte 3")
-    rango_dias = 1..6
+    rango_dias = 1..@dias_produccion
 
     suma_prendas =
     Enum.reduce(lotes, %{}, fn lote, acc ->
@@ -73,7 +74,7 @@ defmodule Reportes do
     mapa =
     Enum.map(rango_dias, fn dia ->
       prendas = Map.get(suma_prendas, dia, 0)
-      %{dia: dia, prendas: prendas, alcanzo_meta: prendas >= 600}
+      %{dia: dia, prendas: prendas, alcanzo_meta: prendas >= @meta_diaria_taller}
     end)
 
     Enum.each(mapa, fn dias ->
@@ -110,7 +111,7 @@ defmodule Reportes do
 
 
   def reporte_r5(lotes) do
-    rango_dias = 1..6
+    rango_dias = 1..@dias_produccion
     mapa =
     Enum.reduce(lotes, %{}, fn lote, acc ->
       Map.update(acc, {lote.confeccionista, lote.dia}, lote.prendas, &(&1 + lote.prendas))

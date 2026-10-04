@@ -20,7 +20,7 @@ defmodule Programa do
     Reportes.reporte_r2(lineas, lotes_ok)
     Reportes.reporte_r3(lotes_ok)
     Reportes.reporte_r4(confeccionistas, lotes_ok)
-    Reportes.reporte_r5(lotes)
+    Reportes.reporte_r5(lotes_ok)
 
 
     end
