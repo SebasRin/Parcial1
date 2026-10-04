@@ -34,7 +34,6 @@ defmodule Liquidacion do
         Map.update(acc, codigo, bonificacion, &(&1 + bonificacion))
 
       end)
-      |> IO.inspect(label: "Confeccionistas que se le aplica la bonificaion")
   end
 
 
@@ -47,7 +46,6 @@ defmodule Liquidacion do
       end
 
     end)
-    |> IO.inspect(label: "Alquiler maquinas")
   end
 
   defp contar_dias(confeccionista, lotes) do
@@ -67,10 +65,18 @@ defmodule Liquidacion do
         Map.update(acc, {lote.confeccionista}, valor_lote(lote), &(&1 + valor_lote(lote)))
     end)
     |> Enum.map(fn {{codigo}, subtotal} ->
-        resultado = subtotal + Map.get(bonificacion, codigo) - Map.get(alquiler, codigo)
-        {codigo, resultado}
+
+        suma_prendas =
+        lotes
+        |> Enum.filter(&(&1.confeccionista == codigo))
+        |> Enum.map(&(&1.prendas))
+        |> Enum.sum()
+
+        bonifi = Map.get(bonificacion, codigo)
+        alqui = Map.get(alquiler, codigo)
+        resultado = subtotal + bonifi - alqui
+        %{codigo: codigo, pago_neto: resultado, bonificacion: bonifi, alquiler: alqui, valor_lote: subtotal, prendas: suma_prendas}
     end)
-    |> IO.inspect(label: "Liquidacion")
 
 
 

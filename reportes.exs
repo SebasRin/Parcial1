@@ -56,7 +56,7 @@ defmodule Reportes do
     |> Enum.sort_by(&(&1.productividad), :desc)
     |> IO.inspect()
 
-    
+
 
   end
 
@@ -87,10 +87,24 @@ defmodule Reportes do
 
     IO.puts("=======================================================")
 
-
   end
 
-  def reporte_r4() do
+  def reporte_r4(confeccionista, lotes) do
+      IO.puts("=========================================================")
+      IO.puts("Reporte 4")
+      lista = Liquidacion.liquidacion(confeccionista, lotes)
 
+      Enum.sort_by(lista, &(&1.pago_neto), :desc)
+      |> Enum.with_index(1)
+      |> Enum.each(fn {liq, idx} ->
+        IO.puts("##{idx}  #{liq.codigo}  #{liq.prendas} prendas")
+        IO.puts("    Valor lote:   #{Util.formatter(liq.valor_lote)}")
+        IO.puts("    Bonificación: #{Util.formatter(liq.bonificacion)}")
+        IO.puts("    Alquiler:     #{Util.formatter(liq.alquiler)}")
+        IO.puts("    Pago neto:    #{Util.formatter(liq.pago_neto)}")
+        IO.puts("")
+      end)
+
+      IO.puts("=========================================================")
   end
 end
