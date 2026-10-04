@@ -20,20 +20,9 @@ defmodule Programa do
     Reportes.reporte_r2(lineas, lotes_ok)
     Reportes.reporte_r3(lotes_ok)
     Reportes.reporte_r4(confeccionistas, lotes_ok)
+    Reportes.reporte_r5(lotes)
 
 
-    Validacion.validacion_lote(confeccionistas, lineas,%{confeccionista: "C01", linea: "L77", dia: 1, prendas: 500, defectos: "abc"})
-    |> IO.inspect()
-
-    Liquidacion.valor_lote(%{confeccionista: "C01", linea: "L77", dia: 1, prendas: 500, defectos: "abc"})
-    |> Util.formatter()
-    |> IO.puts()
-
-    Liquidacion.bonificacion_por_productividad(lotes_ok)
-
-    Liquidacion.alquiler_maquinas(confeccionistas,lotes_ok)
-
-    Liquidacion.liquidacion(confeccionistas,lotes_ok)
     end
 
 

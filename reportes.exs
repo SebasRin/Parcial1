@@ -107,4 +107,72 @@ defmodule Reportes do
 
       IO.puts("=========================================================")
   end
+
+
+  def reporte_r5(lotes) do
+    rango_dias = 1..6
+    mapa =
+    Enum.reduce(lotes, %{}, fn lote, acc ->
+      Map.update(acc, {lote.confeccionista, lote.dia}, lote.prendas, &(&1 + lote.prendas))
+    end)
+
+    mapa_ordenado = Enum.group_by(mapa, fn {{_confeccionista, dia}, _total} -> dia end)
+
+    mapa_ganador =
+    Enum.map(rango_dias, fn dia ->
+      map_encontrado = Map.get(mapa_ordenado, dia, 0)
+      if map_encontrado == 0 do
+        %{dia: dia, ganadores: [], prendas: 0, sin_lotes: true}
+      else
+        max_prendas =
+        Enum.map(map_encontrado, fn {{_confeccionista, _dia}, total} -> total end)
+        |> Enum.max()
+
+        ganadores =
+          Enum.filter(map_encontrado, fn {{_confeccionista, _dia}, total} -> total == max_prendas end)
+          |> Enum.map(fn {{confeccionista, _dia}, _total} -> confeccionista end)
+
+        %{dia: dia, ganadores: ganadores, prendas: max_prendas, sin_lotes: false}
+
+      end
+
+    end)
+
+    conteo_ganadores =
+      Enum.flat_map(mapa_ganador, &(&1.ganadores))
+      |> Enum.frequencies()
+
+    max_dias =
+      case Map.values(conteo_ganadores) do
+        [] -> 0
+        valores -> Enum.max(valores)
+      end
+
+    top =
+      Enum.filter(conteo_ganadores, fn {_confeccionista, dias} -> dias == max_dias end)
+      |> Enum.map(fn {confeccionistas, _dias} -> confeccionistas end)
+
+    IO.puts("=============================================================")
+    IO.puts("Reporte 5")
+
+    Enum.each(mapa_ganador, fn g ->
+      if g.sin_lotes do
+        IO.puts("Dia #{g.dia}: sin lotes validos")
+      else
+        IO.puts("Dia #{g.dia}: #{Enum.join(g.ganadores, ", ")} con #{g.prendas} prendas")
+      end
+    end)
+
+    IO.puts("Primer lugar mas dias")
+    if max_dias == 0 do
+      IO.puts("Nadie gano ningun dia")
+    else
+      IO.puts("#{Enum.join(top, ", ")} #{max_dias} dia")
+    end
+
+
+  end
+
+
+
 end
