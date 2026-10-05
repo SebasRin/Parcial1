@@ -25,8 +25,7 @@ defmodule Validacion do
   Devuelve {:ok, lote} si es válido, o {:error, motivo} con el
   primer motivo de rechazo encontrado.
 
-  IA: Se pidio a chagpt como encadenar validaciones en orden, no sabiamos
-  como funcionaba el with
+  IA - Bitácora 1#: cómo encadenar validaciones en orden con with.
   """
 
   def validacion_lote(confeccionistas, lineas, lote) do
@@ -70,6 +69,27 @@ defmodule Validacion do
 
   defp validar_defectos(_) do
     :error_defectos
+  end
+
+  @doc """
+  Separa los lotes validos
+  """
+
+  def lotes_ok(confeccionistas, lineas, lotes) do
+      Enum.filter(lotes, fn lote ->
+        match?({:ok, _},Validacion.validacion_lote(confeccionistas, lineas, lote))
+      end)
+
+    end
+
+  @doc """
+  Separa los lotes invalidos
+  """
+
+  def lotes_error(confeccionistas, lineas, lotes)do
+    Enum.filter(lotes, fn lote ->
+      match?({:error, _},Validacion.validacion_lote(confeccionistas, lineas, lote))
+    end)
   end
 
 end

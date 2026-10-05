@@ -16,6 +16,9 @@ defmodule Reportes do
   Recibe los confeccionistas, las líneas y la lista de lotes
   rechazados (sin motivo). Vuelve a validar cada lote para obtener
   el motivo.
+
+  IA - Bitácora #6: conteo de rechazos por motivo con
+  Enum.reduce y un mapa preinicializado con Map.update!/3.
   """
 
   def reporte_r1(confeccionistas, lineas, lotes_err) do
@@ -59,6 +62,9 @@ defmodule Reportes do
 
   Ordena de mayor a menor productividad. Las líneas sin lotes válidos
   aparecen con cero prendas.
+
+  IA - Bitácora #3: ordenar por un campo descendente con
+  Enum.sort_by/3.
   """
 
   def reporte_r2(lineas, lotes) do
@@ -125,6 +131,9 @@ defmodule Reportes do
   Muestra prendas, valor de lotes, bonificaciones, alquiler y pago
   neto. Los valores monetarios se imprimen con dos decimales y sin
   notación científica.
+
+  IA - Bitácora #3 y #4: orden descendente por neto con
+  Enum.sort_by/3 y numeración de filas con Enum.with_index(1).
   """
 
   def reporte_r4(confeccionista, lotes) do
@@ -154,6 +163,9 @@ defmodule Reportes do
 
   Los días sin lotes válidos se indican como tales. Si hay empate en
   el primer lugar, se incluyen todos los empatados.
+
+  IA - Bitácora #5 y #7: conteo de días ganados con flat_map +
+  Enum.frequencies, y lista de empatados como texto con Enum.join/2.
   """
 
   def reporte_r5(lotes) do

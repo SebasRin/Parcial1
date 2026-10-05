@@ -110,8 +110,8 @@ defmodule Liquidacion do
         |> Enum.map(&(&1.prendas))
         |> Enum.sum()
 
-        bonifi = Map.get(bonificacion, codigo)
-        alqui = Map.get(alquiler, codigo)
+        bonifi = Map.get(bonificacion, codigo, 0)
+        alqui = Map.get(alquiler, codigo, 0)
         resultado = subtotal + bonifi - alqui
         %{codigo: codigo, pago_neto: resultado, bonificacion: bonifi, alquiler: alqui, valor_lote: subtotal, prendas: suma_prendas}
     end)
