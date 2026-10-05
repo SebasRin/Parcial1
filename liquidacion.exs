@@ -2,7 +2,9 @@
 
 defmodule Liquidacion do
   @moduledoc """
-
+    Cálculo de valores de lote, bonificaciones y alquileres.
+    Este módulo es puro recibe datos y devuelve resultados sin
+    efectos secundarios. Solo se ocupa de los cálculos económicos.
   """
 
 
@@ -10,6 +12,10 @@ defmodule Liquidacion do
   @prendas_diarias_bonificacion 120
   @bonificacion_diaria 18000
   @alquiler_maquina 15000
+
+  @doc """
+  Calcula el valor de un lote ya validado, según su porcentaje
+  """
 
   def valor_lote(lote) do
     valor_base = lote.prendas * @tarifa_base_prenda
@@ -22,6 +28,15 @@ defmodule Liquidacion do
     end
   end
 
+  @doc """
+  Calcula la bonificación por productividad por confeccionista.
+
+  Agrupa las prendas por {confeccionista, dia}. Si el total del día
+  es >= 120, suma 18_000. Luego suma las bonificaciones por
+  confeccionista.
+
+  Devuelve un mapa %{codigo => monto}.
+  """
 
   def bonificacion_por_productividad(lotes) do
       mapa =
@@ -42,6 +57,15 @@ defmodule Liquidacion do
   end
 
 
+  @doc """
+  Calcula el alquiler de máquinas por confeccionista.
+
+  Aplica solo a confeccionistas con alquiler: true que tengan lotes.
+  Cobra 15_000 por cada día distinto trabajado.
+
+  Devuelve un mapa %{codigo => monto}.
+  """
+
   def alquiler_maquinas(confeccionistas, lotes)do
     Map.new(confeccionistas, fn confe ->
       if confe.alquiler == true and Enum.any?(lotes, fn lote -> lote.confeccionista == confe.codigo end) do
@@ -60,6 +84,15 @@ defmodule Liquidacion do
     |> Enum.uniq()
     |> length()
   end
+
+  @doc """
+  Calcula la liquidación total por confeccionista.
+
+  Devuelve una lista de mapas con :codigo, :pago_neto,
+  :bonificacion, :alquiler, :valor_lote y :prendas.
+  Cada mapa corresponde a un confeccionista que tenga al menos un lote.
+
+  """
 
   def liquidacion(confeccionistas, lotes) do
 

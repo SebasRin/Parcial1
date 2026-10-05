@@ -1,10 +1,22 @@
 defmodule Reportes do
   @moduledoc """
+  Reportes del sistema de producción (R1 a R8).
 
+  Los cálculos de conteo son puros, la impresión se realiza con
+  IO.puts en cada función reporte.
   """
 
   @meta_diaria_taller 600
   @dias_produccion 6
+
+  @doc """
+  Imprime el reporte R1: lotes rechazados con su motivo y cantidad
+  de rechazos por cada motivo.
+
+  Recibe los confeccionistas, las líneas y la lista de lotes
+  rechazados (sin motivo). Vuelve a validar cada lote para obtener
+  el motivo.
+  """
 
   def reporte_r1(confeccionistas, lineas, lotes_err) do
 
@@ -41,6 +53,14 @@ defmodule Reportes do
 
   end
 
+  @doc """
+  Imprime el reporte R2: prendas elaboradas por línea y productividad
+  semanal en prendas por puesto (prendas / puestos).
+
+  Ordena de mayor a menor productividad. Las líneas sin lotes válidos
+  aparecen con cero prendas.
+  """
+
   def reporte_r2(lineas, lotes) do
     IO.puts("=======================================================")
     IO.puts("Reporte 2")
@@ -57,9 +77,16 @@ defmodule Reportes do
     |> Enum.sort_by(&(&1.productividad), :desc)
     |> IO.inspect()
 
-
-
   end
+
+
+  @doc """
+  Imprime el reporte R3: prendas producidas por el taller en cada uno
+  de los 6 días, indicando si se alcanzó la meta de 600 prendas.
+
+  Los días sin lotes válidos aparecen con cero. Al final se indica si
+  se alcanzó la meta todos los días y si se alcanzó al menos uno.
+  """
 
   def reporte_r3(lotes) do
     IO.puts("=======================================================")
@@ -90,6 +117,16 @@ defmodule Reportes do
 
   end
 
+
+  @doc """
+  Imprime el reporte R4: liquidación de todos los confeccionistas,
+  numerada y ordenada por pago neto de mayor a menor.
+
+  Muestra prendas, valor de lotes, bonificaciones, alquiler y pago
+  neto. Los valores monetarios se imprimen con dos decimales y sin
+  notación científica.
+  """
+
   def reporte_r4(confeccionista, lotes) do
       IO.puts("=========================================================")
       IO.puts("Reporte 4")
@@ -109,6 +146,15 @@ defmodule Reportes do
       IO.puts("=========================================================")
   end
 
+
+  @doc """
+  Imprime el reporte R5: confeccionista que produjo más prendas cada
+  día (todos si hay empate) y quién ocupó el primer lugar más días al
+  final.
+
+  Los días sin lotes válidos se indican como tales. Si hay empate en
+  el primer lugar, se incluyen todos los empatados.
+  """
 
   def reporte_r5(lotes) do
     rango_dias = 1..@dias_produccion

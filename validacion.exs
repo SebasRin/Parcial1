@@ -1,10 +1,33 @@
 defmodule Validacion do
   @moduledoc """
-
+    Validación de lotes.
+    Cada lote se valida en el orden indicado:
+    confeccionista, línea, día, prendas y defectos. Si un lote
+    incumple más de una regla, se informa únicamente el primer
+    motivo de rechazo.
   """
 
   @dias_produccion 6
   @maximo_prendas_lote 180
+
+
+  @doc """
+  Valida un lote de producción.
+
+  Verifica en orden:
+
+    1. El confeccionista existe.
+    2. La línea de producción existe.
+    3. El día es un entero entre 1 y 6.
+    4. La cantidad de prendas es un entero entre 1 y 180.
+    5. El porcentaje de defectos es un número entre 0 y 100.
+
+  Devuelve {:ok, lote} si es válido, o {:error, motivo} con el
+  primer motivo de rechazo encontrado.
+
+  IA: Se pidio a chagpt como encadenar validaciones en orden, no sabiamos
+  como funcionaba el with
+  """
 
   def validacion_lote(confeccionistas, lineas, lote) do
 

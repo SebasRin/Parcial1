@@ -1,6 +1,8 @@
 defmodule Datos do
   @moduledoc """
-
+    Datos base del sistema.
+    Provee las tres colecciones principales del sistema:
+    confeccionistas, líneas y lotes.
   """
   def confeccionistas do
       [
