@@ -309,16 +309,22 @@ defmodule Reportes do
     end)
 
     case resultados_ordenados do
-      [mejor | _] ->
-        IO.puts("-------------------------------------------------------")
-        IO.puts("Mejor calidad: #{mejor.confeccionista}")
-        IO.puts(
-          "Porcentaje de defectos ponderado: " <>
-          "#{Float.round(mejor.porcentaje_defectos, 2)}%"
-        )
-
       [] ->
         IO.puts("No hay confeccionistas con al menos 3 lotes válidos.")
+
+      [primero | _] ->
+        mejores =
+          Enum.filter(resultados_ordenados, fn resultado ->
+            resultado.porcentaje_defectos == primero.porcentaje_defectos
+          end)
+
+        IO.puts("-------------------------------------------------------")
+
+        Enum.each(mejores, fn mejor ->
+          IO.puts(
+            "Mejor calidad: #{mejor.confeccionista} " <>
+            "(#{Util.formatter(mejor.porcentaje_defectos)}% de defectos ponderado)")
+        end)
     end
   end
 
@@ -344,13 +350,13 @@ defmodule Reportes do
       |> Enum.map(&(&1.prendas))
       |> Enum.sum()
 
-    IO.puts("Total a pagar durante la semana: #{total_pagado}")
+    IO.puts("Total a pagar durante la semana: #{Util.formatter(total_pagado)}")
 
     if total_prendas_validas > 0 do
       promedio = total_pagado / total_prendas_validas
 
       IO.puts(
-        "Costo promedio por prenda valida: #{Float.round(promedio, 2)}"
+        "Costo promedio por prenda valida: #{Util.formatter(Float.round(promedio, 2))}"
       )
     else
       IO.puts("El promedio no puede calcularse porque no hay prendas válidas.")

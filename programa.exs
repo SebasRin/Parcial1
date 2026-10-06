@@ -34,9 +34,9 @@ defmodule Programa do
     Reportes.reporte_r3(lotes_ok)
     Reportes.reporte_r4(confeccionistas, lotes_ok)
     Reportes.reporte_r5(lotes_ok)
-    Reportes.reporte_r6(confeccionistas, lineas, lotes)
-    Reportes.reporte_r7(confeccionistas, lotes)
-    Reportes.reporte_r8(confeccionistas, lineas, lotes)
+    Reportes.reporte_r6(confeccionistas, lineas, lotes_ok)
+    Reportes.reporte_r7(confeccionistas, lotes_ok)
+    Reportes.reporte_r8(confeccionistas, lineas, lotes_ok)
 
     end
 
