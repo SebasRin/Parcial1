@@ -7,7 +7,6 @@ defmodule Programa do
 
   @moduledoc """
   Punto de entrada del sistema de producción.
-
   Orquesta el flujo completo: lee los datos, separa los lotes en
   válidos y rechazados, y ejecuta los reportes R1 a R8. Los efectos
   secundarios (leer datos, imprimir) están concentrados aquí.
@@ -35,7 +34,9 @@ defmodule Programa do
     Reportes.reporte_r3(lotes_ok)
     Reportes.reporte_r4(confeccionistas, lotes_ok)
     Reportes.reporte_r5(lotes_ok)
-
+    Reportes.reporte_r6(confeccionistas, lineas, lotes)
+    Reportes.reporte_r7(confeccionistas, lotes)
+    Reportes.reporte_r8(confeccionistas, lineas, lotes)
 
     end
 
@@ -147,11 +148,11 @@ def mostrar_comprobante(confeccionista, confeccionistas, lotes) do
 
       valor_dia =
         lotes_dia
-        |> Enum.map(&valor_lote/1)
+        |> Enum.map(&(&1.valor_lote/1))
         |> Enum.sum()
 
       bonificacion_dia =
-        bonificacion_por_productividad(lotes_dia)
+        Liquidacion.bonificacion_por_productividad(lotes_dia)
         |> Map.get(confeccionista.codigo, 0)
 
       IO.puts("-------------------------------------------------------")
@@ -164,15 +165,15 @@ def mostrar_comprobante(confeccionista, confeccionistas, lotes) do
 
   suma_lotes =
     lotes
-    |> Enum.map(&valor_lote/1)
+    |> Enum.map(&(&1.valor_lote/1))
     |> Enum.sum()
 
   suma_bonificaciones =
-    bonificacion_por_productividad(lotes)
+    Liquidacion.bonificacion_por_productividad(lotes)
     |> Map.get(confeccionista.codigo, 0)
 
   alquiler =
-    alquiler_maquinas(confeccionistas, lotes)
+    Liquidacion.alquiler_maquinas(confeccionistas, lotes)
     |> Map.get(confeccionista.codigo, 0)
 
   neto =

@@ -232,12 +232,12 @@ defmodule Reportes do
 
   end
 
-    @doc """
+  @doc """
   Imprime el reporte R6: Confeccionista con mejor calidad: menor porcentaje de
   defectos ponderado por prendas entre quienes tengan al menos 3 lotes válidos.
   """
 
-  defp reporte_r6(confecionistas, lineas, lotes) do
+  def reporte_r6(confeccionistas, lineas, lotes) do
     IO.puts("=======================================================")
     IO.puts("Reporte 6")
 
@@ -332,7 +332,7 @@ defmodule Reportes do
     IO.puts("=======================================================")
     IO.puts("Reporte 7")
 
-    liquidacion = liquidacion(confeccionistas, lotes)
+    liquidacion = Liquidacion.liquidacion(confeccionistas, lotes)
 
     total_pagado =
       liquidacion
@@ -402,7 +402,7 @@ defmodule Reportes do
     end
   end
 
-  
+
 
 
 
