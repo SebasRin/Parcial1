@@ -38,7 +38,39 @@ defmodule Programa do
     Reportes.reporte_r7(confeccionistas, lotes_ok)
     Reportes.reporte_r8(confeccionistas, lineas, lotes_ok)
 
-    end
+    liquidaciones = Liquidacion.liquidacion(confeccionistas, lotes_ok)
+
+    Reportes.imprimir_ranking("Ranking predeterminado (neto, descendente)",
+      Reportes.ranking(liquidaciones, []))
+
+    Reportes.imprimir_ranking("Ranking: 3 con más prendas",
+      Reportes.ranking(liquidaciones, campo: :prendas, limite: 3))
+
+    Reportes.imprimir_ranking("Ranking: bruto ascendente",
+      Reportes.ranking(liquidaciones, orden: :asc, campo: :bruto))
+
+    Reportes.imprimir_ranking("Ranking con campo repetido (prendas, neto)",
+      Reportes.ranking(liquidaciones, campo: :prendas, campo: :neto))
+
+      taller_aliado = %{1 => 550, 2 => 620, 3 => 480, 5 => 710, 7 => 200}
+
+      combinado = Reportes.combinar_talleres(Reportes.produccion_diaria(lotes_ok), taller_aliado)
+
+      IO.puts("Producción combinada con el taller aliado:")
+      combinado |> Enum.sort() |> Enum.each(fn {dia, prendas} -> IO.puts("Día #{dia}: #{prendas} prendas") end)
+  end
+
+  @doc """
+  Combina la producción diaria propia con la de un taller aliado,
+  sumando las prendas de los días presentes en ambos mapas.
+  """
+  def combinar_talleres(produccion_propia, taller_aliado) do
+    Map.merge(produccion_propia, taller_aliado, fn _dia, propias, aliadas ->
+      propias + aliadas
+    end)
+  end
+
+  
 
 
   def ingresar_lote_adicional(confeccionistas, lineas) do
@@ -124,69 +156,69 @@ defmodule Programa do
           lotes_confeccionista
         )
     end
-end
+  end
 
-def mostrar_comprobante(confeccionista, confeccionistas, lotes) do
-  IO.puts("")
-  IO.puts("---------------------------------------------")
-  IO.puts("Comprobante Individual")
+  def mostrar_comprobante(confeccionista, confeccionistas, lotes) do
+    IO.puts("")
+    IO.puts("---------------------------------------------")
+    IO.puts("Comprobante Individual")
 
-  IO.puts("Nombre: #{confeccionista.nombre}")
-  IO.puts("Código: #{confeccionista.codigo}")
+    IO.puts("Nombre: #{confeccionista.nombre}")
+    IO.puts("Código: #{confeccionista.codigo}")
 
-  lotes_por_dia =
-    Enum.group_by(lotes, &(&1.dia))
+    lotes_por_dia =
+      Enum.group_by(lotes, &(&1.dia))
 
-  Enum.each(
-    Enum.sort_by(lotes_por_dia, fn {dia, _lotes} -> dia end),
-    fn {dia, lotes_dia} ->
+    Enum.each(
+      Enum.sort_by(lotes_por_dia, fn {dia, _lotes} -> dia end),
+      fn {dia, lotes_dia} ->
 
-      prendas_dia =
-        lotes_dia
-        |> Enum.map(&(&1.prendas))
-        |> Enum.sum()
+        prendas_dia =
+          lotes_dia
+          |> Enum.map(&(&1.prendas))
+          |> Enum.sum()
 
-      valor_dia =
-        lotes_dia
+        valor_dia =
+          lotes_dia
+          |> Enum.map(&(&1.valor_lote/1))
+          |> Enum.sum()
+
+        bonificacion_dia =
+          Liquidacion.bonificacion_por_productividad(lotes_dia)
+          |> Map.get(confeccionista.codigo, 0)
+
+        IO.puts("-------------------------------------------------------")
+        IO.puts("Día: #{dia}")
+        IO.puts("Prendas por día: #{prendas_dia}")
+        IO.puts("Valor de los lotes por día: #{valor_dia}")
+        IO.puts("Bonificación diaria: #{bonificacion_dia}")
+      end
+      )
+
+      suma_lotes =
+        lotes
         |> Enum.map(&(&1.valor_lote/1))
         |> Enum.sum()
 
-      bonificacion_dia =
-        Liquidacion.bonificacion_por_productividad(lotes_dia)
+      suma_bonificaciones =
+        Liquidacion.bonificacion_por_productividad(lotes)
         |> Map.get(confeccionista.codigo, 0)
 
+      alquiler =
+        Liquidacion.alquiler_maquinas(confeccionistas, lotes)
+        |> Map.get(confeccionista.codigo, 0)
+
+      neto =
+        suma_lotes + suma_bonificaciones - alquiler
+
       IO.puts("-------------------------------------------------------")
-      IO.puts("Día: #{dia}")
-      IO.puts("Prendas por día: #{prendas_dia}")
-      IO.puts("Valor de los lotes por día: #{valor_dia}")
-      IO.puts("Bonificación diaria: #{bonificacion_dia}")
+      IO.puts("Suma de lotes: #{suma_lotes}")
+      IO.puts("Suma de bonificaciones: #{suma_bonificaciones}")
+      IO.puts("Descuento por alquiler: #{alquiler}")
+      IO.puts("Neto: #{neto}")
+
+      IO.puts("=======================================================")
     end
-  )
-
-  suma_lotes =
-    lotes
-    |> Enum.map(&(&1.valor_lote/1))
-    |> Enum.sum()
-
-  suma_bonificaciones =
-    Liquidacion.bonificacion_por_productividad(lotes)
-    |> Map.get(confeccionista.codigo, 0)
-
-  alquiler =
-    Liquidacion.alquiler_maquinas(confeccionistas, lotes)
-    |> Map.get(confeccionista.codigo, 0)
-
-  neto =
-    suma_lotes + suma_bonificaciones - alquiler
-
-  IO.puts("-------------------------------------------------------")
-  IO.puts("Suma de lotes: #{suma_lotes}")
-  IO.puts("Suma de bonificaciones: #{suma_bonificaciones}")
-  IO.puts("Descuento por alquiler: #{alquiler}")
-  IO.puts("Neto: #{neto}")
-
-  IO.puts("=======================================================")
-end
 
 end
 Programa.main()

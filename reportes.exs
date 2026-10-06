@@ -408,7 +408,70 @@ defmodule Reportes do
     end
   end
 
+  @doc """
+Ordena las liquidaciones según una keyword list de opciones:
+  campo:  :neto | :prendas | :bruto   (predeterminado :neto)
+  orden:  :desc | :asc                (predeterminado :desc)
+  limite: entero positivo             (predeterminado: todos)
+Un valor no reconocido se reemplaza por el predeterminado.
+"""
+def ranking(liquidaciones, opciones) do
+  campo = Keyword.get(opciones, :campo, :neto)
+  orden = Keyword.get(opciones, :orden, :desc)
+  limite = Keyword.get(opciones, :limite)
 
+  clave =
+    case campo do
+      :prendas -> :prendas
+      :bruto -> :valor_lote
+      _ -> :pago_neto
+    end
+
+  sentido = if orden == :asc, do: :asc, else: :desc
+
+  ordenadas = Enum.sort_by(liquidaciones, &Map.fetch!(&1, clave), sentido)
+
+  if is_integer(limite) and limite > 0 do
+    Enum.take(ordenadas, limite)
+  else
+    ordenadas
+  end
+end
+
+@doc "Imprime un ranking con su título."
+def imprimir_ranking(titulo, filas) do
+  IO.puts("=======================================================")
+  IO.puts(titulo)
+
+  filas
+  |> Enum.with_index(1)
+  |> Enum.each(fn {liq, idx} ->
+    IO.puts(
+      "##{idx} #{liq.codigo} | prendas: #{liq.prendas} | " <>
+        "bruto: #{Util.formatter(liq.valor_lote)} | neto: #{Util.formatter(liq.pago_neto)}"
+    )
+  end)
+end
+
+    @doc "Producción del taller por día (1 a 6), con cero en los días sin lotes."
+  def produccion_diaria(lotes) do
+    acumulado =
+      Enum.reduce(lotes, %{}, fn lote, acc ->
+        Map.update(acc, lote.dia, lote.prendas, &(&1 + lote.prendas))
+      end)
+
+    Map.new(1..@dias_produccion, fn dia -> {dia, Map.get(acumulado, dia, 0)} end)
+  end
+
+  @doc """
+  Combina la producción diaria propia con la de un taller aliado,
+  sumando las prendas de los días presentes en ambos mapas.
+  """
+  def combinar_talleres(produccion_propia, taller_aliado) do
+    Map.merge(produccion_propia, taller_aliado, fn _dia, propias, aliadas ->
+      propias + aliadas
+    end)
+  end
 
 
 
