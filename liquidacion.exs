@@ -99,7 +99,9 @@ defmodule Liquidacion do
     bonificacion = bonificacion_por_productividad(lotes)
     alquiler = alquiler_maquinas(confeccionistas, lotes)
 
-    Enum.reduce(lotes,%{}, fn lote, acc ->
+    acumulador_inicial = Map.new(confeccionistas, fn confeccionista -> {{confeccionista.codigo}, 0} end)
+
+    Enum.reduce(lotes,acumulador_inicial, fn lote, acc ->
         Map.update(acc, {lote.confeccionista}, valor_lote(lote), &(&1 + valor_lote(lote)))
     end)
     |> Enum.map(fn {{codigo}, subtotal} ->
