@@ -408,35 +408,77 @@ defmodule Reportes do
     end
   end
 
-  @doc """
-Ordena las liquidaciones según una keyword list de opciones:
-  campo:  :neto | :prendas | :bruto   (predeterminado :neto)
-  orden:  :desc | :asc                (predeterminado :desc)
-  limite: entero positivo             (predeterminado: todos)
-Un valor no reconocido se reemplaza por el predeterminado.
-"""
-def ranking(liquidaciones, opciones) do
-  campo = Keyword.get(opciones, :campo, :neto)
-  orden = Keyword.get(opciones, :orden, :desc)
-  limite = Keyword.get(opciones, :limite)
+    @doc """
+  Imprime el comprobante individual de un confeccionista: nombre, código,
+  detalle de cada día trabajado (solo días con al menos un lote válido),
+  sumas, descuento por alquiler y neto. Si el código no existe, lo informa.
+  """
+  def comprobante(confeccionistas, codigo, lotes_ok) do
+    case Enum.find(confeccionistas, nil, fn c -> c.codigo == codigo end) do
+      nil ->
+        IO.puts("El código #{codigo} no existe.")
 
-  clave =
-    case campo do
-      :prendas -> :prendas
-      :bruto -> :valor_lote
-      _ -> :pago_neto
+      confe ->
+        propios = Enum.filter(lotes_ok, fn lote -> lote.confeccionista == codigo end)
+        [liq] = Liquidacion.liquidacion([confe], propios)
+        por_dia = Enum.group_by(propios, fn lote -> lote.dia end)
+
+        IO.puts("=======================================================")
+        IO.puts("Comprobante: #{confe.nombre} (#{confe.codigo})")
+
+        por_dia
+        |> Map.keys()
+        |> Enum.sort()
+        |> Enum.each(fn dia ->
+          lotes_dia = Map.fetch!(por_dia, dia)
+          prendas = lotes_dia |> Enum.map(fn l -> l.prendas end) |> Enum.sum()
+          valor = lotes_dia |> Enum.map(&Liquidacion.valor_lote/1) |> Enum.sum()
+          bonificacion = Liquidacion.bonificacion_dia(prendas)
+
+          IO.puts(
+            "Día #{dia}: #{prendas} prendas | lotes: #{Util.formatter(valor)} | " <>
+              "bonificación: #{Util.formatter(bonificacion)}"
+          )
+        end)
+
+        IO.puts("Suma de lotes: #{Util.formatter(liq.valor_lote)}")
+        IO.puts("Suma de bonificaciones: #{Util.formatter(liq.bonificacion)}")
+        IO.puts("Descuento por alquiler: #{Util.formatter(liq.alquiler)}")
+        IO.puts("Neto: #{Util.formatter(liq.pago_neto)}")
     end
-
-  sentido = if orden == :asc, do: :asc, else: :desc
-
-  ordenadas = Enum.sort_by(liquidaciones, &Map.fetch!(&1, clave), sentido)
-
-  if is_integer(limite) and limite > 0 do
-    Enum.take(ordenadas, limite)
-  else
-    ordenadas
   end
-end
+
+    @doc """
+  Ordena las liquidaciones según una keyword list de opciones:
+    campo:  :neto | :prendas | :bruto   (predeterminado :neto)
+    orden:  :desc | :asc                (predeterminado :desc)
+    limite: entero positivo             (predeterminado: todos)
+  Un valor no reconocido se reemplaza por el predeterminado.
+  """
+  def ranking(liquidaciones, opciones) do
+    campo = Keyword.get(opciones, :campo, :neto)
+    orden = Keyword.get(opciones, :orden, :desc)
+    limite = Keyword.get(opciones, :limite)
+
+    clave =
+      case campo do
+        :prendas -> :prendas
+        :bruto -> :valor_lote
+        _ -> :pago_neto
+      end
+
+    sentido = if orden == :asc, do: :asc, else: :desc
+
+    ordenadas = Enum.sort_by(liquidaciones, &Map.fetch!(&1, clave), sentido)
+
+    if is_integer(limite) and limite > 0 do
+      Enum.take(ordenadas, limite)
+    else
+      ordenadas
+    end
+  end
+
+
 
 @doc "Imprime un ranking con su título."
 def imprimir_ranking(titulo, filas) do

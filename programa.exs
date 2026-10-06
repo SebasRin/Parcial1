@@ -24,7 +24,8 @@ defmodule Programa do
   def main do
     confeccionistas = Datos.confeccionistas()
     lineas = Datos.lineas()
-    lotes = Datos.lotes()
+    adicional = pedir_lote_adicional(confeccionistas, lineas)
+    lotes = Datos.lotes() ++ adicional
     lotes_ok = Validacion.lotes_ok(confeccionistas, lineas, lotes)
     lotes_error = Validacion.lotes_error(confeccionistas, lineas, lotes)
 
@@ -37,6 +38,9 @@ defmodule Programa do
     Reportes.reporte_r6(confeccionistas, lineas, lotes_ok)
     Reportes.reporte_r7(confeccionistas, lotes_ok)
     Reportes.reporte_r8(confeccionistas, lineas, lotes_ok)
+
+
+    pedir_comprobante(confeccionistas, lotes_ok)
 
     liquidaciones = Liquidacion.liquidacion(confeccionistas, lotes_ok)
 
@@ -60,6 +64,52 @@ defmodule Programa do
       combinado |> Enum.sort() |> Enum.each(fn {dia, prendas} -> IO.puts("Día #{dia}: #{prendas} prendas") end)
   end
 
+  # Devuelve [] o [lote]. Un lote rechazado también se devuelve, para que
+  # aparezca en el reporte R1 con su motivo.
+  defp pedir_lote_adicional(confeccionistas, lineas) do
+    entrada =
+      leer_linea(
+        "Ingrese un lote adicional (confeccionista;linea;dia;prendas;defectos)\n" <>
+          "o Enter para omitir: "
+      )
+
+    case entrada do
+      "" ->
+        IO.puts("Lote adicional omitido.")
+        []
+
+      texto ->
+        case Validacion.parsear_lote(texto) do
+          {:error, :formato_invalido} ->
+            IO.puts("Formato inválido: el lote adicional no se agregó.")
+            []
+
+          {:ok, lote} ->
+            case Validacion.validacion_lote(confeccionistas, lineas, lote) do
+              {:ok, _lote} ->
+                IO.puts("Lote adicional agregado.")
+                [lote]
+
+              {:error, motivo} ->
+                IO.puts("Lote adicional rechazado: #{motivo}")
+                [lote]
+            end
+        end
+    end
+  end
+
+  defp pedir_comprobante(confeccionistas, lotes_ok) do
+    codigo = leer_linea("Ingrese el código del confeccionista para su comprobante: ")
+    Reportes.comprobante(confeccionistas, codigo, lotes_ok)
+  end
+
+  # IO.gets devuelve :eof si no hay entrada; se trata como línea vacía.
+  defp leer_linea(mensaje) do
+    case IO.gets(mensaje) do
+      texto when is_binary(texto) -> String.trim(texto)
+      _ -> ""
+    end
+  end
   @doc """
   Combina la producción diaria propia con la de un taller aliado,
   sumando las prendas de los días presentes en ambos mapas.
@@ -70,7 +120,7 @@ defmodule Programa do
     end)
   end
 
-  
+
 
 
   def ingresar_lote_adicional(confeccionistas, lineas) do

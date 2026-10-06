@@ -45,12 +45,7 @@ defmodule Liquidacion do
       end)
 
       Enum.reduce(mapa, %{}, fn {{codigo, _dia}, total}, acc ->
-        bonificacion =
-        if total >= @prendas_diarias_bonificacion do
-            @bonificacion_diaria
-        else
-          0
-        end
+        bonificacion = bonificacion_dia(total)
         Map.update(acc, codigo, bonificacion, &(&1 + bonificacion))
 
       end)
@@ -118,8 +113,10 @@ defmodule Liquidacion do
         %{codigo: codigo, pago_neto: resultado, bonificacion: bonifi, alquiler: alqui, valor_lote: subtotal, prendas: suma_prendas}
     end)
 
+  end
 
-
+  def bonificacion_dia(prendas_del_dia) do
+    if prendas_del_dia >= @prendas_diarias_bonificacion, do: @bonificacion_diaria, else: 0
   end
 
 end

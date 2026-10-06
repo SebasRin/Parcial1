@@ -92,4 +92,50 @@ defmodule Validacion do
     end)
   end
 
+  @doc """
+Convierte el texto "confeccionista;linea;dia;prendas;defectos" en un lote.
+Devuelve {:ok, lote} o {:error, :formato_invalido} cuando no hay exactamente
+cinco campos, cuando el día o las prendas no son enteros o cuando los
+defectos no son numéricos. No aplica las reglas de validación.
+"""
+  def parsear_lote(texto) do
+    with [confeccionista, linea, dia, prendas, defectos] <- String.split(texto, ";"),
+        {:ok, dia} <- a_entero(dia),
+        {:ok, prendas} <- a_entero(prendas),
+        {:ok, defectos} <- a_numero(defectos) do
+      {:ok,
+      %{
+        confeccionista: String.trim(confeccionista),
+        linea: String.trim(linea),
+        dia: dia,
+        prendas: prendas,
+        defectos: defectos
+      }}
+    else
+      _ -> {:error, :formato_invalido}
+    end
+  end
+
+  defp a_entero(texto) do
+    case Integer.parse(String.trim(texto)) do
+      {numero, ""} -> {:ok, numero}
+      _ -> :error
+    end
+  end
+
+  defp a_numero(texto) do
+    limpio = String.trim(texto)
+
+    case Integer.parse(limpio) do
+      {numero, ""} ->
+        {:ok, numero}
+
+      _ ->
+        case Float.parse(limpio) do
+          {numero, ""} -> {:ok, numero}
+          _ -> :error
+        end
+    end
+  end
+
 end
